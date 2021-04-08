@@ -87,7 +87,6 @@ def training_code(data_directory, model_directory):
     features = scaler.transform(features)
     # classifier = RandomForestClassifier(n_estimators=n_estimators, max_leaf_nodes=max_leaf_nodes,
     #                                     random_state=random_state).fit(features, labels)
-    print('yo')
     classifier = MLPClassifier(hidden_layer_sizes=(100,50,20),random_state=random_state, verbose=10).fit(features, labels)
     # save_model(filename, classes, leads, imputer, classifier)
     save_model(filename, classes, leads, scaler, classifier)
@@ -257,7 +256,7 @@ def run_my_model(model, header, recording):
     # data[num_leads] = age
     # data[num_leads + 1] = sex
 
-    recording, samples, frequency = get_ts_features(header, recording, twelve_leads)
+    recording, samples, frequency = get_ts_features(header, recording, leads)
     time = calcLength(samples, frequency)
 
     # in seconds
@@ -268,8 +267,8 @@ def run_my_model(model, header, recording):
         recording_segment = recording[:, int(segment * segment_length * frequency):
                                          int((segment + 1) * segment_length * frequency)]
         new_segments = []
-        for lead in range(12):
-            lead_segment = recording_segment[lead, :]
+        for lead_id, lead in enumerate(leads):
+            lead_segment = recording_segment[lead_id, :]
             new_segment = resample_segment(lead_segment, len(lead_segment), frequency, 200)
             new_segments.append(new_segment)
         recording_segment = np.stack(new_segments)
